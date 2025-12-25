@@ -53,6 +53,7 @@ void ConfigurationWindow::render()
     ImGui::SeparatorText("Population");
     ImGui::DragInt("Initial min age", &m_config.population.initial_min_age, 1, 0, 90);
     ImGui::DragInt("Initial max age", &m_config.population.initial_max_age, 1, 0, 90);
+    ImGui::DragInt("Initial max children", &m_config.population.MaxChild, 1, 0, 90);
     if (ImGui::DragFloat("Percentage of women", &m_config.population.percentage_of_women, 0, 0, 100)) {
         m_config.population.percentage_of_men = 100 - m_config.population.percentage_of_women;
     }

@@ -21,6 +21,7 @@ struct SimulationConfig
         float couple_creation_probability_per_day = 0.003f;
         float couple_breaking_probability_per_day = 0.0001f;
         float child_creation_probability_per_day = 0.0001f;
+        std::int32_t MaxChild = 1;
     };
     Population population;
 };
