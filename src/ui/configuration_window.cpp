@@ -1,5 +1,8 @@
 #include "configuration_window.hpp"
 
+#include "village/entities_registry.hpp"
+#include "village/village.hpp"
+
 #include <imgui.h>
 
 #include <utility>
@@ -14,7 +17,7 @@ std::size_t convert_time_to_days(const std::int32_t value, const std::int32_t un
         case 0: return value;
         case 1: return value * 30;
         case 2: return value * 365;
-        case 3: return value * 365 * 10;
+        case 3: return value * 365 * 100;
         default: return 0;
     }
 }
@@ -23,6 +26,9 @@ std::size_t convert_time_to_days(const std::int32_t value, const std::int32_t un
 ConfigurationWindow::ConfigurationWindow(std::function<void(const sim::SimulationConfig&)> start_simulation)
   : m_start_simulation(std::move(start_simulation))
 {
+    const auto& eri = village::EntitiesRegistry::get_instance();
+    for (const auto& r : eri.get_residents()) { m_config.residents[r.first] = sim::SimulationConfig::Resident(); }
+    for (const auto& i : eri.get_item()) { m_config.items[i.first] = sim::SimulationConfig::Items(); }
 }
 
 ConfigurationWindow::~ConfigurationWindow() {}
@@ -53,7 +59,6 @@ void ConfigurationWindow::render()
     ImGui::SeparatorText("Population");
     ImGui::DragInt("Initial min age", &m_config.population.initial_min_age, 1, 0, 90);
     ImGui::DragInt("Initial max age", &m_config.population.initial_max_age, 1, 0, 90);
-    ImGui::DragInt("Initial max children", &m_config.population.MaxChild, 1, 0, 90);
     if (ImGui::DragFloat("Percentage of women", &m_config.population.percentage_of_women, 0, 0, 100)) {
         m_config.population.percentage_of_men = 100 - m_config.population.percentage_of_women;
     }
@@ -77,6 +82,25 @@ void ConfigurationWindow::render()
                      0,
                      0,
                      1);
+
+    ImGui::SeparatorText("Residents");
+
+    const auto& ress = village::EntitiesRegistry::get_instance().get_residents();
+    for (auto& r : m_config.residents) {
+        const auto& name = ress.at(r.first);
+        ImGui::Text("%s", name.c_str());
+        ImGui::DragFloat(("Initial percentage##" + name).c_str(), &r.second.initial_percentage, 0, 0, 1);
+        ImGui::DragFloat(("Become probability##" + name).c_str(), &r.second.become_probability, 0, 0, 1);
+    }
+
+    ImGui::SeparatorText("Tools");
+
+    const auto& iess = village::EntitiesRegistry::get_instance().get_item();
+    for (auto& i : m_config.items) {
+        const auto& name = iess.at(i.first);
+        ImGui::Text("%s", name.c_str());
+        ImGui::DragFloat(("Item cost##" + name).c_str(), &i.second.item_cost, 0, 0, 100);
+    }
 
     ImGui::SeparatorText("Run");
 

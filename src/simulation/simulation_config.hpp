@@ -1,6 +1,8 @@
 #pragma once
 #include <cstddef>
 #include <cstdint>
+#include <map>
+#include <string>
 
 namespace vsa::sim {
 
@@ -24,6 +26,19 @@ struct SimulationConfig
         std::int32_t MaxChild = 1;
     };
     Population population;
+
+     struct Resident
+    {
+        float initial_percentage = 0.05f;
+        float become_probability = 0.05f;
+    };
+    std::map<std::string, Resident> residents;
+
+    struct Items
+    {
+        float item_cost = 0.05f;
+    };
+    std::map<std::string, Items> items;
 };
 
 }
